@@ -4,6 +4,13 @@ export const SAMPLE_DEVICES = [
   { id: 'RB-C', tipus: 'Portàtil', estat: 'Diagnosi' },
 ];
 
+export const DEVICE_TYPES = [
+  'Portàtil',
+  'Ordinador de sobretaula',
+  'Tauleta',
+  'Servidor',
+];
+
 export const STATUS_CONFIG = {
   'En prova': {
     label: 'En prova',
@@ -21,3 +28,18 @@ export const STATUS_CONFIG = {
     ariaLabel: 'Estat: Diagnosi',
   },
 };
+
+export function generateNextId(devices) {
+  let maxNum = 0;
+  for (const device of devices) {
+    const match = device.id.match(/^RB-(\d+)$/i);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) {
+        maxNum = num;
+      }
+    }
+  }
+  const nextNum = maxNum + 1;
+  return `RB-${String(nextNum).padStart(3, '0')}`;
+}

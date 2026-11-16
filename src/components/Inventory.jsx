@@ -1,12 +1,43 @@
 import { useState, useMemo } from 'react';
-import { SAMPLE_DEVICES, STATUS_CONFIG } from '../data/devices';
+import { SAMPLE_DEVICES, DEVICE_TYPES, STATUS_CONFIG, generateNextId } from '../data/devices';
 
 export default function Inventory() {
+  const [devices, setDevices] = useState(SAMPLE_DEVICES);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('Tots');
 
+  // Estats del formulari d'alta
+  const [selectedType, setSelectedType] = useState('');
+  const [formError, setFormError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // ID calculat automàticament per al següent dispositiu (RB-001, RB-002...)
+  const nextId = useMemo(() => generateNextId(devices), [devices]);
+
+  const handleCreateDevice = (e) => {
+    e.preventDefault();
+
+    // Validació: Cal haver seleccionat un tipus d'equip
+    if (!selectedType || selectedType.trim() === '') {
+      setFormError("Cal seleccionar un tipus d'equip de la llista.");
+      setSuccessMessage('');
+      return;
+    }
+
+    const newDevice = {
+      id: nextId,
+      tipus: selectedType,
+      estat: 'En prova',
+    };
+
+    setDevices((prevDevices) => [...prevDevices, newDevice]);
+    setSuccessMessage(`L'equip ${nextId} (${selectedType}) s'ha donat d'alta correctament.`);
+    setSelectedType('');
+    setFormError('');
+  };
+
   const filteredDevices = useMemo(() => {
-    return SAMPLE_DEVICES.filter((device) => {
+    return devices.filter((device) => {
       const matchesSearch =
         device.id.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
         device.tipus.toLowerCase().includes(searchTerm.toLowerCase().trim());
@@ -16,16 +47,16 @@ export default function Inventory() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchTerm, selectedStatus]);
+  }, [devices, searchTerm, selectedStatus]);
 
   const stats = useMemo(() => {
-    const total = SAMPLE_DEVICES.length;
-    const enProva = SAMPLE_DEVICES.filter((d) => d.estat === 'En prova').length;
-    const apte = SAMPLE_DEVICES.filter((d) => d.estat === 'Apte').length;
-    const diagnosi = SAMPLE_DEVICES.filter((d) => d.estat === 'Diagnosi').length;
+    const total = devices.length;
+    const enProva = devices.filter((d) => d.estat === 'En prova').length;
+    const apte = devices.filter((d) => d.estat === 'Apte').length;
+    const diagnosi = devices.filter((d) => d.estat === 'Diagnosi').length;
 
     return { total, enProva, apte, diagnosi };
-  }, []);
+  }, [devices]);
 
   return (
     <div className="inventory-container">
@@ -59,6 +90,143 @@ export default function Inventory() {
           <span className="stat-label">Diagnosi</span>
           <span className="stat-value">{stats.diagnosi}</span>
         </div>
+      </section>
+
+      {/* Formulari per donar d'alta un nou equip */}
+      <section className="register-card" aria-labelledby="form-heading">
+        <div className="register-header">
+          <h2 id="form-heading" className="register-title">
+            Donar d'alta un nou equip
+          </h2>
+          <p className="register-description">
+            L'identificador es genera de manera automàtica i l'estat inicial s'assigna com a «En prova».
+          </p>
+        </div>
+
+        <form onSubmit={handleCreateDevice} className="register-form" noValidate>
+          <div className="form-fields-grid">
+            {/* ID generat automàticament */}
+            <div className="form-group">
+              <label htmlFor="device-id-field" className="form-label">
+                Identificador (ID)
+              </label>
+              <div className="input-readonly-wrapper">
+                <input
+                  id="device-id-field"
+                  type="text"
+                  className="form-input form-input-readonly"
+                  value={nextId}
+                  readOnly
+                  aria-describedby="device-id-help"
+                />
+                <span id="device-id-help" className="form-help-text">
+                  Generat automàticament
+                </span>
+              </div>
+            </div>
+
+            {/* Selector de tipus d'equip */}
+            <div className="form-group">
+              <label htmlFor="device-type-select" className="form-label">
+                Tipus d'equip <span className="required-marker">*</span>
+              </label>
+              <select
+                id="device-type-select"
+                className={`form-select ${formError ? 'input-error' : ''}`}
+                value={selectedType}
+                onChange={(e) => {
+                  setSelectedType(e.target.value);
+                  if (formError) setFormError('');
+                }}
+                aria-invalid={formError ? 'true' : 'false'}
+                aria-describedby={formError ? 'type-error-msg' : undefined}
+              >
+                <option value="">-- Selecciona un tipus d'equip --</option>
+                {DEVICE_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Estat inicial (En prova) */}
+            <div className="form-group">
+              <label htmlFor="device-status-field" className="form-label">
+                Estat inicial
+              </label>
+              <div className="status-preview-box">
+                <span className="status-badge badge-en-prova">
+                  <span className="status-indicator"></span>
+                  En prova
+                </span>
+                <span className="form-help-text">Assignat per defecte</span>
+              </div>
+            </div>
+
+            {/* Botó d'acció */}
+            <div className="form-group form-submit-group">
+              <button type="submit" className="btn-primary">
+                <svg
+                  className="btn-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Donar d'alta equip
+              </button>
+            </div>
+          </div>
+
+          {/* Missatge d'error de validació */}
+          {formError && (
+            <div id="type-error-msg" className="form-alert form-alert-error" role="alert">
+              <svg
+                className="alert-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 7.5h.008v.008H12v-.008Z"
+                />
+              </svg>
+              <span>{formError}</span>
+            </div>
+          )}
+
+          {/* Missatge de confirmació d'èxit */}
+          {successMessage && (
+            <div className="form-alert form-alert-success" role="status">
+              <svg
+                className="alert-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                />
+              </svg>
+              <span>{successMessage}</span>
+            </div>
+          )}
+        </form>
       </section>
 
       {/* Secció principal de la taula */}
@@ -189,7 +357,7 @@ export default function Inventory() {
         <footer className="inventory-card-footer">
           <p className="footer-count">
             Mostrant <strong>{filteredDevices.length}</strong> de{' '}
-            <strong>{SAMPLE_DEVICES.length}</strong> dispositius registrats
+            <strong>{devices.length}</strong> dispositius registrats
           </p>
           <span className="footer-tag">Dades en memòria local</span>
         </footer>
