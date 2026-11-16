@@ -1,0 +1,104 @@
+:root {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+  /* Color Palette - Light */
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #f8fafc;
+  
+  --border-color: #e2e8f0;
+  --border-light: #edf2f7;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  /* Status: Apte (Success) */
+  --status-apte-bg: #ecfdf5;
+  --status-apte-text: #065f46;
+  --status-apte-border: #a7f3d0;
+  --status-apte-dot: #10b981;
+
+  /* Status: En prova (Warning / Amber) */
+  --status-prova-bg: #fffbeb;
+  --status-prova-text: #92400e;
+  --status-prova-border: #fde68a;
+  --status-prova-dot: #f59e0b;
+
+  /* Status: Diagnosi (Info / Blue) */
+  --status-diag-bg: #eff6ff;
+  --status-diag-text: #1e40af;
+  --status-diag-border: #bfdbfe;
+  --status-diag-dot: #3b82f6;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page: #0f172a;
+    --bg-card: #1e293b;
+    --bg-subtle: #192338;
+    --bg-hover: #26334a;
+
+    --border-color: #334155;
+    --border-light: #283548;
+
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+
+    --primary: #3b82f6;
+    --primary-hover: #60a5fa;
+
+    /* Status: Apte (Dark) */
+    --status-apte-bg: rgba(6, 78, 59, 0.3);
+    --status-apte-text: #6ee7b7;
+    --status-apte-border: rgba(16, 185, 129, 0.4);
+    --status-apte-dot: #34d399;
+
+    /* Status: En prova (Dark) */
+    --status-prova-bg: rgba(120, 53, 15, 0.3);
+    --status-prova-text: #fcd34d;
+    --status-prova-border: rgba(245, 158, 11, 0.4);
+    --status-prova-dot: #fbbf24;
+
+    /* Status: Diagnosi (Dark) */
+    --status-diag-bg: rgba(30, 58, 138, 0.35);
+    --status-diag-text: #93c5fd;
+    --status-diag-border: rgba(59, 130, 246, 0.4);
+    --status-diag-dot: #60a5fa;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
