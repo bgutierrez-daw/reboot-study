@@ -1,8 +1,30 @@
-import { useState, useMemo } from 'react';
-import { SAMPLE_DEVICES, DEVICE_TYPES, STATUS_CONFIG, generateNextId } from '../data/devices';
+import { useState, useMemo, useEffect } from 'react';
+import {
+  SAMPLE_DEVICES,
+  DEVICE_TYPES,
+  STATUS_OPTIONS,
+  STATUS_CONFIG,
+  STORAGE_KEY,
+  generateNextId,
+} from '../data/devices';
 
 export default function Inventory() {
-  const [devices, setDevices] = useState(SAMPLE_DEVICES);
+  // Inicialització des de localStorage o dades per defecte
+  const [devices, setDevices] = useState(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('Error en carregar les dades de localStorage:', error);
+    }
+    return SAMPLE_DEVICES;
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('Tots');
 
@@ -10,6 +32,15 @@ export default function Inventory() {
   const [selectedType, setSelectedType] = useState('');
   const [formError, setFormError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Sincronització automàtica amb localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(devices));
+    } catch (error) {
+      console.error('Error en desar les dades a localStorage:', error);
+    }
+  }, [devices]);
 
   // ID calculat automàticament per al següent dispositiu (RB-001, RB-002...)
   const nextId = useMemo(() => generateNextId(devices), [devices]);
@@ -36,6 +67,24 @@ export default function Inventory() {
     setFormError('');
   };
 
+  // Canvi d'estat d'un equip des del desplegable
+  const handleStatusChange = (deviceId, newStatus) => {
+    setDevices((prevDevices) =>
+      prevDevices.map((device) =>
+        device.id === deviceId ? { ...device, estat: newStatus } : device
+      )
+    );
+  };
+
+  // Restabliment a dades de mostra
+  const handleResetData = () => {
+    if (window.confirm("Vols restablir l'inventari a les dades inicials de mostra?")) {
+      setDevices(SAMPLE_DEVICES);
+      setSuccessMessage('Inventari restablert a les dades inicials de mostra.');
+      setFormError('');
+    }
+  };
+
   const filteredDevices = useMemo(() => {
     return devices.filter((device) => {
       const matchesSearch =
@@ -49,14 +98,15 @@ export default function Inventory() {
     });
   }, [devices, searchTerm, selectedStatus]);
 
+  // Mètriques superiors: recompte de dispositius per cada estat
   const stats = useMemo(() => {
-    const total = devices.length;
-    const enProva = devices.filter((d) => d.estat === 'En prova').length;
-    const apte = devices.filter((d) => d.estat === 'Apte').length;
-    const diagnosi = devices.filter((d) => d.estat === 'Diagnosi').length;
+    const total = SAMPLE_DEVICES.length;
+    const enProva = SAMPLE_DEVICES.filter((d) => d.estat === 'En prova').length;
+    const apte = SAMPLE_DEVICES.filter((d) => d.estat === 'Apte').length;
+    const diagnosi = SAMPLE_DEVICES.filter((d) => d.estat === 'Diagnosi').length;
 
     return { total, enProva, apte, diagnosi };
-  }, [devices]);
+  }, []);
 
   return (
     <div className="inventory-container">
@@ -72,8 +122,8 @@ export default function Inventory() {
         </p>
       </header>
 
-      {/* Targetes de resum d'estat */}
-      <section className="stats-grid" aria-label="Resum de l'estat dels dispositius">
+      {/* Targetes de resum superior: recompte de dispositius per estat */}
+      <section className="stats-grid" aria-label="Recompte de dispositius per estat">
         <div className="stat-card">
           <span className="stat-label">Total dispositius</span>
           <span className="stat-value">{stats.total}</span>
@@ -328,13 +378,31 @@ export default function Inventory() {
                         </div>
                       </td>
                       <td className="device-status-cell">
-                        <span
-                          className={`status-badge ${statusInfo.className}`}
-                          aria-label={statusInfo.ariaLabel}
-                        >
-                          <span className="status-indicator"></span>
-                          {device.estat}
-                        </span>
+                        <div className="status-dropdown-wrapper">
+                          <select
+                            className={`status-select ${statusInfo.className}`}
+                            value={device.estat}
+                            onChange={(e) => handleStatusChange(device.id, e.target.value)}
+                            aria-label={`Canviar estat del dispositiu ${device.id}`}
+                          >
+                            {STATUS_OPTIONS.map((status) => (
+                              <option key={status} value={status}>
+                                {status}
+                              </option>
+                            ))}
+                          </select>
+                          <svg
+                            className="status-dropdown-arrow"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2.5}
+                            stroke="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                          </svg>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -359,7 +427,17 @@ export default function Inventory() {
             Mostrant <strong>{filteredDevices.length}</strong> de{' '}
             <strong>{devices.length}</strong> dispositius registrats
           </p>
-          <span className="footer-tag">Dades en memòria local</span>
+          <div className="footer-actions">
+            <span className="footer-tag">Desat a localStorage</span>
+            <button
+              type="button"
+              className="btn-reset-data"
+              onClick={handleResetData}
+              title="Restablir dades originals de mostra"
+            >
+              Restablir dades inicials
+            </button>
+          </div>
         </footer>
       </main>
 
