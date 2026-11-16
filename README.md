@@ -1,16 +1,41 @@
-# React + Vite
+# REBOOT Study — Inventari de dispositius
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Pràctica realitzada en parella per:
+* **Beatriz Gutierrez** (`bgutierr.daw2n26@lamerce.com`)
+* **Alba Chavez**
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 3. Una correcció documentada (EN PARELLA · 10 MIN)
 
-## React Compiler
+> **Segur que alguna cosa no surt bé a la primera. Documenteu-ne una.**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Què fallava:**  
+  En canviar l'estat d'un equip des del desplegable de la taula, els comptadors superiors no s'actualitzaven en temps real.
 
-## Expanding the ESLint configuration
+* **Com ho vau detectar:**  
+  Vam passar l'equip `RB-A` d'«En prova» a «Apte» i vam veure que les targetes de dalt mantenien les xifres antigues.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **Què vau demanar o canviar:**  
+  Vam demanar recalcular les mètriques directament des de l'estat reactiu dels equips en lloc d'usar les dades estàtiques inicials (`SAMPLE_DEVICES`).
+
+* **Com vau comprovar que ja funciona:**  
+  Vam canviar l'estat de diversos equips i vam veure com els comptadors superiors s'incrementaven i decreixien al mateix instant.
+
+---
+
+## Característiques del projecte
+
+* **Llistat d'inventari:** Pantalla amb taula de dispositius, ID, tipus i estat amb estils visuals diferenciats.
+* **Formulari d'alta:** Generació automàtica d'identificador (`RB-001`, `RB-002`...), selecció de tipus amb validació i assignació inicial «En prova».
+* **Desplegable d'estats a la taula:** Modificació interactiva de l'estat de qualsevol dispositiu en temps real.
+* **Mètriques superiors:** Comptadors actualitzats al moment per cada estat (Total, En prova, Apte, Diagnosi).
+* **Persistència local:** Guardat automàtic a `localStorage` perquè les dades no es perdin en recarregar.
+* **Idioma:** Interfície 100% en català.
+
+## Execució local
+
+```bash
+npm install
+npm run dev
+```

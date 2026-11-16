@@ -98,15 +98,15 @@ export default function Inventory() {
     });
   }, [devices, searchTerm, selectedStatus]);
 
-  // Mètriques superiors: recompte de dispositius per cada estat
+  // Mètriques superiors: recompte de dispositius per cada estat (corregit per reactivitat amb 'devices')
   const stats = useMemo(() => {
-    const total = SAMPLE_DEVICES.length;
-    const enProva = SAMPLE_DEVICES.filter((d) => d.estat === 'En prova').length;
-    const apte = SAMPLE_DEVICES.filter((d) => d.estat === 'Apte').length;
-    const diagnosi = SAMPLE_DEVICES.filter((d) => d.estat === 'Diagnosi').length;
+    const total = devices.length;
+    const enProva = devices.filter((d) => d.estat === 'En prova').length;
+    const apte = devices.filter((d) => d.estat === 'Apte').length;
+    const diagnosi = devices.filter((d) => d.estat === 'Diagnosi').length;
 
     return { total, enProva, apte, diagnosi };
-  }, []);
+  }, [devices]);
 
   return (
     <div className="inventory-container">
