@@ -35,8 +35,8 @@ export default function Inventory() {
   const [formError, setFormError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Estat per al dispositiu seleccionat a la Fitxa de vida (modal)
-  const [selectedDeviceForFitxa, setSelectedDeviceForFitxa] = useState(null);
+  // ID del dispositiu seleccionat per veure la Fitxa de vida (modal)
+  const [selectedDeviceIdForFitxa, setSelectedDeviceIdForFitxa] = useState(null);
 
   // Sincronització automàtica amb localStorage
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function Inventory() {
     setFormError('');
   };
 
-  // Canvi d'estat d'un equip des del desplegable
+  // Canvi d'estat d'un equip des del desplegable o des del botó "Aplica el resultat"
   const handleStatusChange = (deviceId, newStatus) => {
     setDevices((prevDevices) =>
       prevDevices.map((device) =>
@@ -113,19 +113,25 @@ export default function Inventory() {
     return { total, enProva, apte, diagnosi };
   }, [devices]);
 
+  // Dispositiu actiu per a la fitxa de vida (s'actualitza reactivament amb 'devices')
+  const currentFitxaDevice = useMemo(() => {
+    if (!selectedDeviceIdForFitxa) return null;
+    return devices.find((d) => d.id === selectedDeviceIdForFitxa) || null;
+  }, [devices, selectedDeviceIdForFitxa]);
+
   // Proves del dispositiu seleccionat: emparellades per deviceId i ordenades de més recent a més antiga
   const selectedDeviceTests = useMemo(() => {
-    if (!selectedDeviceForFitxa) return [];
+    if (!currentFitxaDevice) return [];
     const matching = rawProves.filter((p) => {
       if (!p.deviceId) return false;
       return (
-        p.deviceId === selectedDeviceForFitxa.id ||
-        String(p.deviceId).trim().toLowerCase() === String(selectedDeviceForFitxa.id).trim().toLowerCase()
+        p.deviceId === currentFitxaDevice.id ||
+        String(p.deviceId).trim().toLowerCase() === String(currentFitxaDevice.id).trim().toLowerCase()
       );
     });
     // Newest first (ordre cronològic invers)
     return [...matching].reverse();
-  }, [selectedDeviceForFitxa]);
+  }, [currentFitxaDevice]);
 
   return (
     <div className="inventory-container">
@@ -428,7 +434,7 @@ export default function Inventory() {
                         <button
                           type="button"
                           className="btn-fitxa-vida"
-                          onClick={() => setSelectedDeviceForFitxa(device)}
+                          onClick={() => setSelectedDeviceIdForFitxa(device.id)}
                           title={`Veure fitxa de vida del dispositiu ${device.id}`}
                           aria-label={`Fitxa de vida del dispositiu ${device.id}`}
                         >
@@ -488,11 +494,12 @@ export default function Inventory() {
       </main>
 
       {/* Modal de Fitxa de vida */}
-      {selectedDeviceForFitxa && (
+      {currentFitxaDevice && (
         <FitxaDeVida
-          device={selectedDeviceForFitxa}
+          device={currentFitxaDevice}
           tests={selectedDeviceTests}
-          onClose={() => setSelectedDeviceForFitxa(null)}
+          onApplyResult={handleStatusChange}
+          onClose={() => setSelectedDeviceIdForFitxa(null)}
         />
       )}
 

@@ -1,12 +1,24 @@
+import { useMemo } from 'react';
 import { STATUS_CONFIG } from '../data/devices';
 
-export default function FitxaDeVida({ device, tests, onClose }) {
+export default function FitxaDeVida({ device, tests, onApplyResult, onClose }) {
+  // Cerca de la darrera prova (la que té el número de test més alt)
+  const latestTest = useMemo(() => {
+    if (!tests || tests.length === 0) return null;
+    const highestNum = Math.max(...tests.map((t) => t.test));
+    return tests.find((t) => t.test === highestNum) || null;
+  }, [tests]);
+
   if (!device) return null;
 
   const currentStatusInfo = STATUS_CONFIG[device.estat] || {
     label: device.estat,
     className: 'badge-default',
   };
+
+  // Comprova si l'estat actual de l'inventari ja coincideix amb el resultat de la darrera prova
+  const isAlreadySameStatus = latestTest ? device.estat === latestTest.result : false;
+  const isButtonDisabled = !latestTest || isAlreadySameStatus;
 
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
@@ -49,13 +61,82 @@ export default function FitxaDeVida({ device, tests, onClose }) {
             <span className="summary-value device-type-name">{device.tipus}</span>
           </div>
           <div className="summary-item">
-            <span className="summary-label">Estat operatiu</span>
+            <span className="summary-label">Estat actual a l'inventari</span>
             <span className={`status-badge ${currentStatusInfo.className}`}>
               <span className="status-indicator"></span>
               {device.estat}
             </span>
           </div>
         </section>
+
+        {/* Secció: Resultat de la darrera prova i botó d'aplicar */}
+        {latestTest && (
+          <section className="latest-test-card" aria-label="Resultat de la darrera prova">
+            <div className="latest-test-content">
+              <div className="latest-test-meta">
+                <span className="latest-test-label">
+                  Resultat de la darrera prova (Prova #{latestTest.test})
+                </span>
+                <div className="latest-test-result-wrapper">
+                  <span
+                    className={`status-badge ${
+                      STATUS_CONFIG[latestTest.result]?.className || 'badge-default'
+                    }`}
+                  >
+                    <span className="status-indicator"></span>
+                    {latestTest.result}
+                  </span>
+                  {latestTest.maxTempC !== undefined && (
+                    <span className="latest-test-detail">
+                      Temp. màx: {latestTest.maxTempC} °C
+                    </span>
+                  )}
+                  {latestTest.batteryPct !== undefined && (
+                    <span className="latest-test-detail">
+                      Bateria: {latestTest.batteryPct}%
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="latest-test-action">
+                <button
+                  type="button"
+                  className="btn-apply-result"
+                  disabled={isButtonDisabled}
+                  onClick={() => onApplyResult(device.id, latestTest.result)}
+                  title={
+                    isAlreadySameStatus
+                      ? `L'equip ja té l'estat «${device.estat}»`
+                      : `Assigna l'estat «${latestTest.result}» a l'inventari`
+                  }
+                >
+                  <svg
+                    className="btn-apply-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                  Aplica el resultat
+                </button>
+                {isAlreadySameStatus && (
+                  <span className="apply-synced-hint">
+                    L'estat ja està actualitzat a {device.estat}
+                  </span>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Llistat de proves del banc */}
         <section className="tests-section" aria-label="Resultats de les proves">
@@ -93,6 +174,7 @@ export default function FitxaDeVida({ device, tests, onClose }) {
               {tests.map((testItem, index) => {
                 const isApte = testItem.result === 'Apte';
                 const resultBadgeClass = isApte ? 'badge-apte' : 'badge-diagnosi';
+                const isHighest = latestTest && testItem.test === latestTest.test;
 
                 return (
                   <article key={index} className="test-card">
@@ -101,6 +183,9 @@ export default function FitxaDeVida({ device, tests, onClose }) {
                         <span className="test-number-tag">
                           Prova #{testItem.test}
                         </span>
+                        {isHighest && (
+                          <span className="latest-test-badge">Darrera prova</span>
+                        )}
                         {testItem.bench && (
                           <span className="test-bench-tag">{testItem.bench}</span>
                         )}
