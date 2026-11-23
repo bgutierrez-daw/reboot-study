@@ -11,6 +11,10 @@ export const DEVICE_TYPES = [
   'Servidor',
 ];
 
+export const STATUS_OPTIONS = ['En prova', 'Apte', 'Diagnosi'];
+
+export const STORAGE_KEY = 'reboot_study_inventory_devices';
+
 export const STATUS_CONFIG = {
   'En prova': {
     label: 'En prova',

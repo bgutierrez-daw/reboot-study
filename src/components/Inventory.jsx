@@ -7,6 +7,8 @@ import {
   STORAGE_KEY,
   generateNextId,
 } from '../data/devices';
+import rawProves from '../data/proves.json';
+import FitxaDeVida from './FitxaDeVida';
 
 export default function Inventory() {
   // Inicialització des de localStorage o dades per defecte
@@ -32,6 +34,9 @@ export default function Inventory() {
   const [selectedType, setSelectedType] = useState('');
   const [formError, setFormError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Estat per al dispositiu seleccionat a la Fitxa de vida (modal)
+  const [selectedDeviceForFitxa, setSelectedDeviceForFitxa] = useState(null);
 
   // Sincronització automàtica amb localStorage
   useEffect(() => {
@@ -98,7 +103,7 @@ export default function Inventory() {
     });
   }, [devices, searchTerm, selectedStatus]);
 
-  // Mètriques superiors: recompte de dispositius per cada estat (corregit per reactivitat amb 'devices')
+  // Mètriques superiors: recompte de dispositius per cada estat (reactiu a 'devices')
   const stats = useMemo(() => {
     const total = devices.length;
     const enProva = devices.filter((d) => d.estat === 'En prova').length;
@@ -107,6 +112,20 @@ export default function Inventory() {
 
     return { total, enProva, apte, diagnosi };
   }, [devices]);
+
+  // Proves del dispositiu seleccionat: emparellades per deviceId i ordenades de més recent a més antiga
+  const selectedDeviceTests = useMemo(() => {
+    if (!selectedDeviceForFitxa) return [];
+    const matching = rawProves.filter((p) => {
+      if (!p.deviceId) return false;
+      return (
+        p.deviceId === selectedDeviceForFitxa.id ||
+        String(p.deviceId).trim().toLowerCase() === String(selectedDeviceForFitxa.id).trim().toLowerCase()
+      );
+    });
+    // Newest first (ordre cronològic invers)
+    return [...matching].reverse();
+  }, [selectedDeviceForFitxa]);
 
   return (
     <div className="inventory-container">
@@ -341,6 +360,7 @@ export default function Inventory() {
                 <th scope="col">ID</th>
                 <th scope="col">Tipus</th>
                 <th scope="col">Estat</th>
+                <th scope="col" className="text-right">Accions</th>
               </tr>
             </thead>
             <tbody>
@@ -404,12 +424,38 @@ export default function Inventory() {
                           </svg>
                         </div>
                       </td>
+                      <td className="device-actions-cell text-right">
+                        <button
+                          type="button"
+                          className="btn-fitxa-vida"
+                          onClick={() => setSelectedDeviceForFitxa(device)}
+                          title={`Veure fitxa de vida del dispositiu ${device.id}`}
+                          aria-label={`Fitxa de vida del dispositiu ${device.id}`}
+                        >
+                          <svg
+                            className="btn-fitxa-icon"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.75}
+                            stroke="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                            />
+                          </svg>
+                          Fitxa de vida
+                        </button>
+                      </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={3} className="empty-state-cell">
+                  <td colSpan={4} className="empty-state-cell">
                     <p className="empty-title">No s'han trobat dispositius</p>
                     <p className="empty-description">
                       Cap equip coincideix amb els criteris de cerca o filtre seleccionats.
@@ -440,6 +486,15 @@ export default function Inventory() {
           </div>
         </footer>
       </main>
+
+      {/* Modal de Fitxa de vida */}
+      {selectedDeviceForFitxa && (
+        <FitxaDeVida
+          device={selectedDeviceForFitxa}
+          tests={selectedDeviceTests}
+          onClose={() => setSelectedDeviceForFitxa(null)}
+        />
+      )}
 
       <footer className="app-footer">
         <p>REBOOT Study &copy; {new Date().getFullYear()} — Sistema d'inventari intern</p>

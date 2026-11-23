@@ -526,7 +526,7 @@
   color: var(--text-primary);
 }
 
-/* Status Badges */
+/* Status Badges & Dropdown */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -544,6 +544,45 @@
   height: 7px;
   border-radius: 50%;
   display: inline-block;
+}
+
+/* Status Dropdown in Table Rows */
+.status-dropdown-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 6px 30px 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.status-select:focus-visible {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+.status-select:hover {
+  filter: brightness(0.96);
+}
+
+.status-dropdown-arrow {
+  position: absolute;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  opacity: 0.75;
 }
 
 /* Apte */
@@ -577,6 +616,43 @@
 .badge-diagnosi .status-indicator {
   background-color: var(--status-diag-dot);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+/* Actions Column & Button Fitxa de Vida */
+.text-right {
+  text-align: right;
+}
+
+.device-actions-cell {
+  vertical-align: middle;
+}
+
+.btn-fitxa-vida {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-fitxa-vida:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-fitxa-icon {
+  width: 16px;
+  height: 16px;
 }
 
 /* Empty State */
@@ -628,6 +704,371 @@
   padding: 3px 8px;
   border-radius: 4px;
   border: 1px solid var(--border-color);
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-reset-data {
+  background: none;
+  border: 1px dashed var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-reset-data:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+  background-color: var(--bg-card);
+}
+
+/* ========================================================
+   Fitxa de Vida Modal
+   ======================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeInBackdrop 0.2s ease-out;
+}
+
+.modal-container {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  text-align: left;
+  animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-badge {
+  margin-bottom: 6px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.modal-close-btn {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--border-color);
+}
+
+/* Device Summary in Modal */
+.device-summary-card {
+  margin: 20px 28px 0;
+  padding: 16px 20px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Tests Section in Modal */
+.tests-section {
+  padding: 20px 28px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tests-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tests-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tests-count-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+/* Empty Tests Message */
+.no-tests-box {
+  padding: 40px 20px;
+  text-align: center;
+  background-color: var(--bg-subtle);
+  border: 1px dashed var(--border-color);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.no-tests-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.no-tests-text {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.no-tests-subtext {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 360px;
+}
+
+/* Test Cards */
+.tests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.test-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s ease;
+}
+
+.test-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.test-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.test-card-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.test-number-tag {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.test-bench-tag {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  background-color: var(--bg-subtle);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.test-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 10px 14px;
+  background-color: var(--bg-subtle);
+  border-radius: 8px;
+}
+
+.metric-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.test-reasons-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .test-reasons-wrapper {
+    background-color: rgba(225, 29, 72, 0.15);
+    border-color: rgba(244, 63, 94, 0.3);
+  }
+}
+
+.reasons-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #be123c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .reasons-label {
+    color: #fda4af;
+  }
+}
+
+.reasons-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.8125rem;
+  color: #881337;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .reasons-list {
+    color: #fecdd3;
+  }
+}
+
+.test-reasons-empty {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.modal-footer {
+  padding: 16px 28px;
+  background-color: var(--bg-subtle);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--border-color);
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* App Footer */
@@ -683,6 +1124,18 @@
   .inventory-table th,
   .inventory-table td {
     padding: 12px 16px;
+  }
+
+  .device-summary-card {
+    grid-template-columns: 1fr;
+    margin: 16px 20px 0;
+  }
+
+  .modal-header,
+  .tests-section,
+  .modal-footer {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 
